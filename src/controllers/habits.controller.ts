@@ -1,13 +1,24 @@
 import { type Request, type Response } from 'express';
+import { z } from 'zod';
 
 import { habitModel } from '../models/habit.model';
+import { buildValidationErrorMessage } from '../utils/build-validation-error-message';
 
 export class HabitsController {
   store = async (request: Request, response: Response): Promise<Response> => {
-    const { name } = request.body;
+    const schema = z.object({
+      name: z.string(),
+    });
+
+    const habit = schema.safeParse(request.body);
+
+    if (!habit.success) {
+      const errors = buildValidationErrorMessage(habit.error.issues);
+      return response.status(422).json({ message: errors });
+    }
 
     const findHabit = await habitModel.findOne({
-      name,
+      name: habit.data.name,
     });
 
     if (findHabit) {
@@ -15,10 +26,16 @@ export class HabitsController {
     }
 
     const newHabit = await habitModel.create({
-      name,
+      name: habit.data.name,
       completedDates: [],
     });
 
     return response.status(201).json(newHabit);
+  };
+
+  index = async (request: Request, response: Response) => {
+    const habits = await habitModel.find().sort({ name: 1 });
+
+    return response.status(200).json(habits);
   };
 }
