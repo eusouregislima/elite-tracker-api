@@ -1,9 +1,20 @@
-import express from 'express'
+import express from 'express';
+
+import { setupMongo } from './database';
+import { routes } from './routes';
 
 const app = express();
 
-app.get('/', (request, response)=> {
-  return response.send('Hello Express + Typescript')
-})
+app.use(express.json());
 
-app.listen(4000, ()=> console.log(`Server is running at port 4000`))
+setupMongo()
+  .then(() => {
+    app.use(routes);
+
+    app.listen(4000, () => {
+      console.log('Server is running at port 4000');
+    });
+  })
+  .catch((err) => {
+    console.error(err.message);
+  });
