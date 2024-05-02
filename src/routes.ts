@@ -15,3 +15,4 @@ routes.get('/', (request, response) => {
 
 routes.get('/habits', habitsController.index);
 routes.post('/habits', habitsController.store);
+routes.delete('/habits/:id', habitsController.remove);
