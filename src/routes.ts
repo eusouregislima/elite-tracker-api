@@ -16,6 +16,7 @@ routes.get('/', (request, response) => {
 });
 
 routes.get('/habits', habitsController.index);
+routes.get('/habits/:id/metrics', habitsController.metrics);
 routes.post('/habits', habitsController.store);
 routes.delete('/habits/:id', habitsController.remove);
 routes.patch('/habits/:id/toggle', habitsController.toggle);
