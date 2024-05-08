@@ -30,13 +30,16 @@ export class HabitsController {
     const newHabit = await habitModel.create({
       name: habit.data.name,
       completedDates: [],
+      userId: request.user.id,
     });
 
     return response.status(201).json(newHabit);
   };
 
   index = async (request: Request, response: Response) => {
-    const habits = await habitModel.find().sort({ name: 1 });
+    const habits = await habitModel
+      .find({ userId: request.user.id })
+      .sort({ name: 1 });
 
     return response.status(200).json(habits);
   };
@@ -55,6 +58,7 @@ export class HabitsController {
 
     const findHabit = await habitModel.findOne({
       _id: habit.data.id,
+      userId: request.user.id,
     });
 
     if (!findHabit) {
@@ -82,6 +86,7 @@ export class HabitsController {
 
     const findHabit = await habitModel.findOne({
       _id: validated.data.id,
+      userId: request.user.id,
     });
 
     if (!findHabit) {
@@ -151,6 +156,7 @@ export class HabitsController {
       .aggregate()
       .match({
         _id: new mongoose.Types.ObjectId(validated.data.id),
+        userId: request.user.id,
       })
       .project({
         _id: 1,
